@@ -1,8 +1,8 @@
 #hyp_custom.yaml
 #File for overriding select default hyperparameters for custom training runs
 
-lr0: 0.01
-lrf: 0.02
+lr0: 0.001
+lrf: 0.001
 degrees: 5.0
 translate: 0.2
 scale: 0.6

@@ -12,18 +12,21 @@ def main():
     model = YOLO(yolov5su)
 
     results = model.train(
-        data = "coco128.yaml",
-        epochs = 300,
+        data = "VisDrone.yaml",
+        epochs = 200,
         imgsz = 640,
         batch = 16,
-        lr0 = 0.01,
-        hyp = "cfg/hyp_custom.yaml",
+        lr0 = 0.001,
+        lrf = 0.01,
+        # degrees = 5.0,
+        # translate = 0.2,
+        # scale = 0.3,
         project = "my_training_runs",
-        name = "yolov5su_custom_hyp_300",
+        name = "yolov5su_visdrone_200",
         save = True,
         exist_ok = False #overrides if folder with same name already exists
 
     )
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__":
+    main()
