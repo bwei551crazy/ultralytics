@@ -1,0 +1,16 @@
+#uc_detrac.yaml
+
+path: /datasets/ua-detrac (original)
+train: /datasets/ua-detrac (original)/content/UA-DETRAC/DETRAC_Upload/images/train
+val: /datasets/ua-detrac (original)/content/UA-DETRAC/DETRAC_Upload/images/val
+
+#number of classes
+nc: 4
+
+#Class names
+names:
+  0: Truck
+  1: Car
+  2: Van
+  3: Bus
+  
