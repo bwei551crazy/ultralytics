@@ -6,11 +6,10 @@ val: /home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac (original)/co
 
 #number of classes
 nc: 4
-
 #Class names
-names:
-  7: Truck
-  2: Car
-  80: Van
-  5 : Bus
-  
+# names:
+#   1: Truck
+#   0: Car
+#   1: Van    #cause Van doesn't exist in COCO.yaml and number 80 is not used in COCO dataset, so mapped to this to not misclassify with coco dataset
+#   2 : Bus
+names: ['car', 'truck', 'van', 'bus']  

@@ -15,17 +15,30 @@ val: images/val # val images (relative to 'path') 548 images
 test: images/test # test-dev images (optional) 1610 images
 
 # Classes
+#Original labelling
+# names:
+#   0: pedestrian
+#   1: people
+#   2: bicycle
+#   3: car
+#   4: van
+#   5: truck
+#   6: tricycle
+#   7: awning-tricycle
+#   8: bus
+#   9: motor
+
 names:
   0: pedestrian
-  1: people
-  2: bicycle
-  3: car
-  4: van
-  5: truck
-  6: tricycle
-  7: awning-tricycle
-  8: bus
-  9: motor
+  0: people
+  1: bicycle
+  2: car
+  80: van
+  7: truck
+  1: tricycle
+  1: awning-tricycle
+  5: bus
+  3: motor
 
 # Download script/URL (optional) ---------------------------------------------------------------------------------------
 download: |
