@@ -54,8 +54,8 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_directory = 'datasets/coco128/images/train2017'
-    label_directory = 'datasets/coco128/labels/train2017'
-    output_directory = 'datasets/coco128/images/train2017_bboxes'
+    img_directory = 'datasets/ua-detrac/images/train'
+    label_directory = 'datasets/ua-detrac/labels/train'
+    output_directory = 'datasets/ua-detrac/images/train_bbox'
     
     plot_bounding_boxes(img_directory, label_directory, output_directory)

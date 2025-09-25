@@ -6,11 +6,5 @@ val: /home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac (original)/co
 
 #number of classes
 nc: 4
-
 #Class names
-names:
-  7: Truck
-  2: Car
-  80: Van
-  5 : Bus
-  
+names: ['others','car', 'bus', 'van']
