@@ -1,4 +1,4 @@
-#visually inspect the bounding box of the dataset
+#Creates a folder for visually inspecting the bounding box and labelling of a dataset
 
 import os
 import cv2
@@ -54,8 +54,8 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_directory = 'datasets/ua-detrac/images/train'
-    label_directory = 'datasets/ua-detrac/labels/train'
-    output_directory = 'datasets/ua-detrac/images/train_bbox'
+    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/UA-DETRAC-10K-SAMPLE.v1i.yolov11/train/images'
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/UA-DETRAC-10K-SAMPLE.v1i.yolov11/train/labels'
+    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/UA-DETRAC-10K-SAMPLE.v1i.yolov11/train_boxxes'
     
     plot_bounding_boxes(img_directory, label_directory, output_directory)

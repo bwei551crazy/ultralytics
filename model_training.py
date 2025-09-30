@@ -1,7 +1,6 @@
 from ultralytics import YOLO
 import torch
 
-
 def main():
     
     cuda_available = torch.cuda.is_available()
@@ -13,19 +12,20 @@ def main():
     yolov8m = "yolov8m.pt"
     yolov11n = "yolo11n.pt"
     yolov11s = "yolo11s.pt"
+    yolov11m = "yolo11m.pt"
     yolov11l = "yolo11l.pt"
-    custom_yolo = "my_training_runs/yolov8s_1.pt/weights/best.pt" #Change this for different custom trained models
+    custom_yolo = "my_training_runs/yolo11l_ua_detrac_2002/weights/last.pt" #Change this for different custom trained models
 
-    #loading a pretrained model
-    model = YOLO(yolov11l)
+    model = YOLO(yolov11m)  # load a pretrained model (recommended for transfer learning)
 
     #=================================================For training on ua_detrac dataset==========================================================#
     results = model.train(
-        data = "ua_detrac.yaml",    #"ultralytics/cfg/datasets/ua_detrac.yaml",
-        epochs = 200,
+        data = "ua_detrac_10k.yaml",    #"ultralytics/cfg/datasets/ua_detrac.yaml",
+        epochs = 50,
         imgsz = 640,
-        batch = 32,
-        lr0 = 0.0001,
+        batch = 16,
+        lr0 = 0.001,
+        weight_decay = 0.0005,
         amp = True,
         augment= True,
         hsv_h= 0.015,  # Randomly adjust hue
@@ -39,12 +39,12 @@ def main():
         mosaic= 1.0,   # Use mosaic augmentation (combines 4 images) - keep enabled
         mixup= 0.0,    # Start with mixup off, can try 0.1 later if needed
         cos_lr = True,  # Use cosine learning rate schedule for smoother training
-        patience = 50,  # Early stopping patience
-        optimizer = 'SGD',
-        momentum = 0.937,
+        patience = 25,  # Early stopping patience
+        optimizer = 'AdamW',
+        momentum = 0.9,
         project = "my_training_runs",
-        name = "yolo11l_ua_detrac_100",
-        freeze = 10, #freeze first 10 layers (backbone) for transfer learning
+        name = "yolo11m_ua_detrac_10k_50",
+        freeze = 0, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
         save = True,
         exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING

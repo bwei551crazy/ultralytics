@@ -1,10 +1,15 @@
 #uc_detrac.yaml
 
-path: /home/yanjiaqi/own_ultralytics/ultralytics/datasets
-train: /home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac (original)/content/UA-DETRAC/DETRAC_Upload/images/train
-val: /home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac (original)/content/UA-DETRAC/DETRAC_Upload/images/val
+path: /home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac (original)
+train: images/train
+val: images/val
 
 #number of classes
 nc: 4
-#Class names
-names: ['others','car', 'bus', 'van']
+# Classes
+names: 
+#Original UA-DETRAC CLASS MAPPING
+  0: truck
+  1: car
+  2: van
+  3: bus  
