@@ -21,8 +21,8 @@ def main():
     #=================================================For training on ua_detrac dataset==========================================================#
     results = model.train(
         data = "ua_detrac_10k.yaml",    #"ultralytics/cfg/datasets/ua_detrac.yaml",
-        epochs = 50,
-        imgsz = 640,
+        epochs = 100,
+        imgsz = 800,
         batch = 16,
         lr0 = 0.001,
         weight_decay = 0.0005,
@@ -43,7 +43,7 @@ def main():
         optimizer = 'AdamW',
         momentum = 0.9,
         project = "my_training_runs",
-        name = "yolo11m_ua_detrac_10k_50",
+        name = "yolo11m_ua_detrac_10k_100",
         freeze = 0, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
         save = True,

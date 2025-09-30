@@ -143,6 +143,7 @@ dmypy.json
 # datasets and projects (ignore /datasets dir at root only to allow for docs/en/datasets dir)
 datasets/ 
 yolo11l_coco128_300_infer/
+yolo11m_ua_detrac_infer/
 *.zip  
 VisDrone/
 ua-detrac/
