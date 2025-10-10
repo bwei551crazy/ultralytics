@@ -56,8 +56,8 @@ def main():
         data = "ua_detrac_10k.yaml",    #"ultralytics/cfg/datasets/ua_detrac.yaml",
         epochs = 100,
         imgsz = 800,
-        batch = 12,
-        lr0 = 0.001,
+        batch = 8,
+        lr0 = 0.0001,
         weight_decay = 0.0005,
         amp = True,
         augment= True,
@@ -77,6 +77,9 @@ def main():
         momentum = 0.9,
         project = "my_training_runs",
         name = "rtdetr_ua_detrac_10k_100",
+        warmup_epochs= 5.0, # (float) warmup epochs (fractions allowed)
+        warmup_momentum= 0.9, # (float) initial momentum during warmup
+        warmup_bias_lr= 0.1, # (float) bias learning rate during warmup
         freeze = 0, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
         save = True,
@@ -85,5 +88,7 @@ def main():
 
     #===============================================For resuming training=======================================================#
     # results = model.train(resume = True)
+
+
 if __name__ == "__main__":
     main()

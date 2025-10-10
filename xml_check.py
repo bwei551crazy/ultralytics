@@ -1,6 +1,9 @@
+"""
+Scrip to inspect and compare the number of frames and object annotations in xml files. 
+"""
 import xml.etree.ElementTree as ET
 
-#works within the ua-detrac dataset folder
+#place within the dataset folder that uses .xml files for annotations
 
 def inspect_xml_structure(xml_file):
     tree = ET.parse(xml_file)
