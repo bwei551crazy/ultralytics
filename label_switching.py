@@ -1,21 +1,24 @@
 #File for switching labels in datasets around
 
 import os
+import glob
 from pathlib import Path
+from tqdm import tqdm
 
-#original
-#0: truck
-#1: car
-#2: van
-#3: bus
-
-#UA-DETRAC dataset switchroo
-#LEFT: UA-DETRAC CLASS ID Original
-#RIGHT: New UA-DETRAC CLASS ID
-
-ua_to_coco = {
-
-    # Skip classes 6,7,8 as they don't have good COCO equivalents
+#Map relevant BD100k categories to COCO categories
+#LEFT: BDD100k CLASS ID
+#RIGHT: COCO CLASS ID
+#each lane marking class isn't available in coco dataset
+#rider class from bdd100k also not available in coco dataset
+bdd100k_to_coco = {
+    0: 1,
+    1: 5,
+    4: 0,
+    5: 80,
+    6: 9,
+    7: 11,
+    8: 6,
+    9: 7
 }
 
 #VISDRONE DATASET to COCO dataset
@@ -37,9 +40,9 @@ visdrone_to_coco = {
 
 #function to remap the labels of given dataset to the labels used in coco dataset
 
-def remap_labels(label_dir):
+def remap_labels(label_dir, map_dic):
     """Remap UA-DETRAC labels to COCO class IDs"""
-    for label_file in os.listdir(label_dir):
+    for label_file in tqdm(os.listdir(label_dir)):
         if label_file.endswith('.txt'):
             label_path = os.path.join(label_dir, label_file)
             
@@ -51,22 +54,55 @@ def remap_labels(label_dir):
                 parts = line.strip().split()
                 if len(parts) >= 5:
                     old_class = int(parts[0])
-                    if old_class in ua_to_coco:
-                        new_class = ua_to_coco[old_class]
+                    if old_class in map_dic:
+                        new_class = map_dic[old_class]
                         parts[0] = str(new_class)
+                        new_lines.append(' '.join(parts) + '\n')
+                    else:
                         new_lines.append(' '.join(parts) + '\n')
             
             # Write back modified labels
             with open(label_path, 'w') as f:
                 f.writelines(new_lines)
 
-#switch 3rd parameter with the appropriate mapping dictionary if using different dataset
+#Used to help check whether a certain class id exist as a label in a dataset
+def find_class_id_in_labels(folder_path, target_class_id):
+    """
+    Search through all .txt files in a folder for a specific class ID
+    """
+    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
+    files_with_class = []
+    
+    for file_path in txt_files:
+        with open(file_path, 'r') as file:
+            for line_num, line in enumerate(file, 1):
+                # COCO format: class_id x_center y_center width height
+                parts = line.strip().split()
+                if parts and parts[0] == str(target_class_id):
+                    files_with_class.append({
+                        'file': file_path,
+                        'line_number': line_num,
+                        'line_content': line.strip()
+                    })
+    
+    return files_with_class
 
 if __name__ == "__main__":
 
-    #Change the path correspondingly to where the dataset is store (must be the absolute path)   
-    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/ua-detrac/UA-DETRAC_UPD_ANN/labels/train'
+    #A quick script for checking whether a certain class ID exists in the labels of a dataset
+    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train"
+    target_class_id = [80]  # Change this to your desired class ID
+
+    for i in target_class_id:
+        print(f"Searching for class ID {i} in labels...")
+
+        results = find_class_id_in_labels(folder_path, i)
+
+        print(f"Found class ID {i} in {len(results)} files:")
+
+    # #Put absolute path to which image folder you want to use for remapping labels
+    # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val'
     
-    remap_labels(label_directory)
+    # remap_labels(label_directory, bdd100k_to_coco)
 
    

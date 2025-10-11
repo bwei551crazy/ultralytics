@@ -1,7 +1,7 @@
 task: detect
 mode: train
-model: rtdetr-l.pt
-data: ua_detrac_10k.yaml
+model: my_training_runs/rtdetr_ua_detrac_10k_1002/weights/last.pt
+data: /home/yanjiaqi/own_ultralytics/ultralytics/ultralytics/cfg/datasets/ua_detrac_10k.yaml
 epochs: 100
 time: null
 patience: 25
@@ -24,7 +24,7 @@ single_cls: false
 rect: false
 cos_lr: true
 close_mosaic: 10
-resume: false
+resume: my_training_runs/rtdetr_ua_detrac_10k_1002/weights/last.pt
 amp: true
 fraction: 1.0
 profile: false

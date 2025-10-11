@@ -3,12 +3,13 @@
 import os
 import cv2
 import glob
+from tqdm import tqdm
 
 def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     os.makedirs(output_dir, exist_ok=True)
     img_paths = glob.glob(os.path.join(img_dir, '*.jpg'))
     
-    for img_path in img_paths:
+    for img_path in tqdm(img_paths):
         img_name = os.path.basename(img_path)
         label_path = os.path.join(label_dir, img_name.replace('.jpg', '.txt'))
         
@@ -54,8 +55,8 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone.v2i.yolov11/train/images'
-    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone.v2i.yolov11/train/labels'
-    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone.v2i.yolov11/train_boxxes'
+    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/train'
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train'
+    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/train_bboxes_remap'
     
     plot_bounding_boxes(img_directory, label_directory, output_directory)
