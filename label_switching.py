@@ -1,7 +1,11 @@
-#File for switching labels in datasets around
+"""
+File for switching labels in datasets around with capability to check for duplicates too. 
+
+"""
 
 import os
 import glob
+import json
 from pathlib import Path
 from tqdm import tqdm
 
@@ -87,18 +91,28 @@ def find_class_id_in_labels(folder_path, target_class_id):
     
     return files_with_class
 
+def has_duplicate_dicts(dict_list):
+    seen = set()
+    for d in dict_list:
+        # Convert dict to JSON string for hashing
+        dict_str = json.dumps(d, sort_keys=True)
+        if dict_str in seen:
+            return True
+        seen.add(dict_str)
+    return False
+
 if __name__ == "__main__":
 
-    #A quick script for checking whether a certain class ID exists in the labels of a dataset
-    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train"
-    target_class_id = [80]  # Change this to your desired class ID
+    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/labels/train"
+    target_class_id = [0,1,2,3,5,6,7,9,11,80]  # Change this to your desired class ID
 
     for i in target_class_id:
+
         print(f"Searching for class ID {i} in labels...")
-
         results = find_class_id_in_labels(folder_path, i)
-
-        print(f"Found class ID {i} in {len(results)} files:")
+        print(f"Found class ID {i} {len(results)} times within the labels ")
+    
+    #print(f"Found duplicates: {has_duplicate_dicts(results)}")
 
     # #Put absolute path to which image folder you want to use for remapping labels
     # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val'

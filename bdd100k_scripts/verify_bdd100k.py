@@ -1,5 +1,9 @@
 """
-Verifies image-label consistency in YOLO datasets.
+
+Verifies image-label consistency in YOLO datasets. 
+
+Used alongside bdd100k_conv.py and bdd100k_conv_config.py
+Obtained from repo: https://github.com/KavinAravindhan/bdd100k-to-yolo
 
 Usage:
     python verify_dataset.py --dataset /path/to/dataset [--legacy]

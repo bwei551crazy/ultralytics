@@ -1,4 +1,7 @@
 """
+Used alongside verify_bdd100k.py and bdd100k_conv_config.py
+Obtained from repo: https://github.com/KavinAravindhan/bdd100k-to-yolo
+
 Converts BDD100K dataset annotations to YOLO-compatible format.
 
 Outputs include:

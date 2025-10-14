@@ -55,8 +55,8 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/train'
-    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train'
-    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/train_bboxes_remap'
+    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/images/train'
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/labels/train'
+    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/images/train_bboxes_remap'
     
     plot_bounding_boxes(img_directory, label_directory, output_directory)

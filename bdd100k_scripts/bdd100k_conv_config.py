@@ -1,3 +1,9 @@
+"""
+Used alongside bdd100k_conv.py and verify_bdd100k.py
+Obtained from repo: https://github.com/KavinAravindhan/bdd100k-to-yolo
+
+"""
+
 from pathlib import Path
 
 # === CONFIGURATION FILE FOR BDD100K TO YOLO FORMAT CONVERSION ===
