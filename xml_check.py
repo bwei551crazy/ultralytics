@@ -1,5 +1,5 @@
 """
-Scrip to inspect and compare the number of frames and object annotations in xml files. 
+Scrip to inspect and compare the number of frames and object annotations in xml files. Mainly used for UA-DETRAC. 
 """
 import xml.etree.ElementTree as ET
 

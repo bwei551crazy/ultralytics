@@ -55,8 +55,13 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/images/train'
-    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/labels/train'
-    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/images/train_bboxes_remap'
-    
+    # print(f"Stupid {cv2.__file__}")
+    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone/VisDrone2019-DET-train/images'
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone/VisDrone2019-DET-train/labels'
+    output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/VisDrone/VisDrone2019-DET-train/train_bboxes_remap'
+
+    # img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val'
+    # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val'
+    # output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val_bboxes_original'
+
     plot_bounding_boxes(img_directory, label_directory, output_directory)

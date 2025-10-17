@@ -15,14 +15,23 @@ from tqdm import tqdm
 #each lane marking class isn't available in coco dataset
 #rider class from bdd100k also not available in coco dataset
 bdd100k_to_coco = {
-    0: 1,
-    1: 5,
-    4: 0,
-    5: 80,
-    6: 9,
-    7: 11,
-    8: 6,
-    9: 7
+    # 0: 1,
+    # 1: 5,
+    # 4: 0,
+    # 5: 80,
+    # 6: 9,
+    # 7: 11,
+    # 8: 6,
+    # 9: 7
+
+    1: 0,
+    5: 1,
+    0: 4,
+    80: 5,
+    9: 6,
+    11: 7,
+    6: 8,
+    7: 9
 }
 
 #VISDRONE DATASET to COCO dataset
@@ -30,16 +39,16 @@ bdd100k_to_coco = {
 #RIGHT: COCO CLASS ID
 
 visdrone_to_coco = {
-    0: 0,  #pedestrian (people standing/walking)
-    1: 0,   #people (in sitting)
-    2: 1,   #bicycle
-    3: 2,   #car
-    4: 80,  #van 
-    5: 7,   #truck  
-    6: 1,   #tricycle (coco counts tricycle as bicycle)
-    7: 1,   #awning-tricycle (coco counts tricycle as bicycle)
-    8: 5,   #bus    
-    9: 3    #motor (coco labels motor as motorcycle)
+    #0: 0,  #pedestrian (people standing/walking)
+    81: 1,   #people (in sitting)
+    1: 2,   #bicycle
+    2: 3,   #car
+    80: 4,  #van 
+    7: 5,   #truck  
+    83: 6,   #tricycle (the pedalling kind of tricycles. Can have that huge area at the back for storage)
+    82: 7,   #Motored vers of the tricycle above. Typically will be more encased
+    5: 8,   #bus    
+    3: 9    #motor (coco labels motor as motorcycle)
 }
 
 #function to remap the labels of given dataset to the labels used in coco dataset
@@ -103,8 +112,8 @@ def has_duplicate_dicts(dict_list):
 
 if __name__ == "__main__":
 
-    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/labels/train"
-    target_class_id = [0,1,2,3,5,6,7,9,11,80]  # Change this to your desired class ID
+    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"
+    target_class_id = [0,1,2,3,4,5,6,7,8,9]  # Change this to your desired class ID
 
     for i in target_class_id:
 
@@ -115,8 +124,9 @@ if __name__ == "__main__":
     #print(f"Found duplicates: {has_duplicate_dicts(results)}")
 
     # #Put absolute path to which image folder you want to use for remapping labels
-    # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val'
+    # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train'
     
+    # #CHANGE THE MAPPING PARAMETER BEFORE EXECUTING THE FILE!!!!!!
     # remap_labels(label_directory, bdd100k_to_coco)
 
    

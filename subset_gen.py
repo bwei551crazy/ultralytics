@@ -1,202 +1,241 @@
-"""
-This file contains code for creating a subset of a dataset, to tackle the challenge of imbalanced class distribution object 
-detection dataset. 
-
-"""
-
 import os
 import shutil
 import random
-from tqdm import tqdm
-from pathlib import Path
+import cv2
+import numpy as np
+from collections import Counter, defaultdict
+import albumentations as A
+import argparse
 
-"""
-Create a subset of a dataset containing at least one of the underrepresented classes
-
-Args:
-    orig_img_dir (str): Path to the original images directory
-    orig_lbl_dir (str): Path to the original labels directory
-    sav_img_dir (str): Path to the directory where subset images will be saved
-    sav_lbl_dir (str): Path to the directory where subset labels will be saved
-    under_rep_classes (list): List of underrepresented class IDs to include in the subset
-    copy_ratio (float): Ratio of images containing underrepresented classes to copy (default is 1.0, meaning all such images are copied)
-
-"""
-
-def create_subset(orig_img_dir, orig_lbl_dir, sav_img_dir, sav_lbl_dir, 
-                                   class_ratios):
-    """
-    Create a subset with specified duplication ratios for each class
-    Each class is processed independently to ensure exact ratios
-    
-    Args:
-        class_ratios: Dictionary with {class_index: ratio} e.g., {0: 0.5, 1: 2.0, 2: 1.5}
-    """
-    
-    os.makedirs(sav_img_dir, exist_ok=True)
-    os.makedirs(sav_lbl_dir, exist_ok=True)
-
-    lbl_files = list(Path(orig_lbl_dir).glob('*.txt'))
-    print(f"Found {len(lbl_files)} label files")
-
-    # Step 1: Find files that contain the classes we want to process
-    target_classes = set(class_ratios.keys())
-    class_files = {class_idx: [] for class_idx in target_classes}
-    
-    for lbl_file in lbl_files:
-        try: 
-            with open(lbl_file, 'r') as f:
-                lines = f.readlines()
-                
-            file_classes = set()
-            for line in lines:
-                if line.strip():
-                    try:
-                        class_idx = int(line.split()[0])
-                        file_classes.add(class_idx)
-                    except (ValueError, IndexError):
-                        print(f"Warning: Malformed line in {lbl_file}: {line.strip()}")
-                        continue
-            
-            # Only add files that contain our target classes
-            for class_idx in target_classes:
-                if class_idx in file_classes:
-                    class_files[class_idx].append(lbl_file)
-                
-        except Exception as e:
-            print(f"Error reading {lbl_file}: {e}")
-    
-    print(f"Found files for target classes:")
-    for class_idx, files in class_files.items():
-        print(f"  Class {class_idx}: {len(files)} files")
-
-    # Step 2: Process each class completely independently
-    files_to_copy = []
-    
-    for class_idx, files in class_files.items():
-        ratio = class_ratios[class_idx]
+class SmartOversampler:
+    def __init__(self, dataset_path, target_classes=[1, 3, 6, 80]):
+        self.dataset_path = dataset_path
+        self.target_classes = target_classes
+        self.setup_augmentations()
         
-        if ratio <= 0:
-            continue
-            
-        print(f"\nProcessing class {class_idx} with ratio {ratio}")
+    def setup_augmentations(self):
+        """Setup augmentation strategies - using ONLY color/quality transforms"""
         
-        if ratio <= 1.0:
-            # Under-sampling: take a subset
-            random.shuffle(files)
-            num_files = max(1, int(len(files) * ratio))
-            selected_files = files[:num_files]
-            print(f"  Selecting {num_files} out of {len(files)} files")
-            
-            # Add each file once
-            for file in selected_files:
-                files_to_copy.append((file, 1, class_idx))
-                
-        else:
-            # Over-sampling: duplicate ALL files for this class
-            base_copies = int(ratio)
-            fractional_part = ratio - base_copies
-            
-            print(f"  Duplicating {len(files)} files:")
-            print(f"    Base copies: {base_copies}")
-            print(f"    Fractional: {fractional_part:.2f}")
-            
-            total_copies_for_class = 0
-            for file in files:
-                copies = base_copies
-                # Handle fractional part probabilistically
-                if random.random() < fractional_part:
-                    copies += 1
-                
-                files_to_copy.append((file, copies, class_idx))
-                total_copies_for_class += copies
-            
-            print(f"    Total copies for class {class_idx}: {total_copies_for_class}")
-
-    print(f"\nTotal file-copy operations: {len(files_to_copy)}")
-    
-    # Step 3: Copy files with duplication
-    copied_cnt = 0
-    img_cnt = 0
-    skipped_cnt = 0
-    class_copy_count = {class_idx: 0 for class_idx in target_classes}
-    
-    for file_path, num_copies, class_idx in tqdm(files_to_copy):
-        base_name = file_path.stem
+        # Use ONLY non-geometric augmentations to avoid coordinate issues
+        self.augmentation_color = A.Compose([
+            A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=0.8),
+            A.RandomBrightnessContrast(brightness_limit=0.3, contrast_limit=0.3, p=0.7),
+            A.GaussNoise(var_limit=(10.0, 50.0), p=0.4),
+            A.ChannelShuffle(p=0.2),
+            A.CLAHE(clip_limit=2.0, p=0.3),
+            A.ISONoise(color_shift=(0.01, 0.05), intensity=(0.1, 0.5), p=0.3),
+            A.RandomGamma(gamma_limit=(80, 120), p=0.3),
+        ])
         
-        for copy_num in range(num_copies):
-            try:
-                img_copied = False
+        self.augmentation_weather = A.Compose([
+            A.RandomFog(fog_coef_lower=0.1, fog_coef_upper=0.3, p=0.3),
+            A.RandomRain(p=0.2),
+            A.RandomSunFlare(flare_roi=(0, 0, 1, 0.5), p=0.2),
+            A.MotionBlur(blur_limit=5, p=0.3),
+            A.MedianBlur(blur_limit=5, p=0.2),
+        ])
+        
+        self.all_augmentations = [
+            self.augmentation_color,
+            self.augmentation_weather,
+        ]
+    
+    def filter_target_files(self, split='train'):
+        """Find all files containing target classes and copy them to a filtered folder"""
+        original_label_dir = os.path.join(self.dataset_path, 'labels', split)
+        original_image_dir = os.path.join(self.dataset_path, 'images', split)
+        
+        # Create filtered dataset folder
+        filtered_path = os.path.join(self.dataset_path, f'filtered_{split}')
+        filtered_label_dir = os.path.join(filtered_path, 'labels')
+        filtered_image_dir = os.path.join(filtered_path, 'images')
+        
+        os.makedirs(filtered_label_dir, exist_ok=True)
+        os.makedirs(filtered_image_dir, exist_ok=True)
+        
+        target_files = []
+        class_counts = Counter()
+        
+        print("Filtering files containing target classes...")
+        
+        for label_file in os.listdir(original_label_dir):
+            if label_file.endswith('.txt'):
+                label_path = os.path.join(original_label_dir, label_file)
                 
-                # Create unique filename for each copy
-                if num_copies > 1:
-                    new_base_name = f"{base_name}_c{class_idx}_copy{copy_num+1}"
-                else:
-                    new_base_name = f"{base_name}_c{class_idx}"
+                # Check if this file contains any target classes
+                with open(label_path, 'r') as f:
+                    has_target_class = False
+                    for line in f:
+                        parts = line.strip().split()
+                        if parts:
+                            class_id = int(parts[0])
+                            if class_id in self.target_classes:
+                                has_target_class = True
+                                class_counts[class_id] += 1
                 
-                source_lbl = file_path
-                dest_lbl = Path(sav_lbl_dir) / f"{new_base_name}.txt"
-
-                source_img = Path(orig_img_dir) / f"{base_name}.jpg"    
-                if source_img.exists():
-                    dest_img = Path(sav_img_dir) / f"{new_base_name}.jpg"
-                    shutil.copy2(source_img, dest_img)
-                    img_copied = True
-                    img_cnt += 1
-                
-                if img_copied: 
-                    shutil.copy2(source_lbl, dest_lbl)
-                    copied_cnt += 1
-                    class_copy_count[class_idx] += 1
-                else:
-                    print(f"No image found for {base_name}, so skipped")
-                    skipped_cnt += 1
+                if has_target_class:
+                    target_files.append(label_file)
                     
-            except Exception as e:
-                print(f"Error copying files for {base_name} (copy {copy_num+1}): {e}")
-                skipped_cnt += 1
-                continue
-
-    print(f"\n=== FINAL RESULTS ===")
-    print(f"Successfully copied {copied_cnt} image-label pairs")
-    print(f"Total images copied: {img_cnt}")
-    print(f"Skipped {skipped_cnt} files due to errors or missing images")
-    
-    print(f"\nClass distribution after duplication:")
-    for class_idx in target_classes:
-        original_count = len(class_files[class_idx])
-        ratio = class_ratios[class_idx]
-        expected_count = original_count * ratio if ratio > 1.0 else original_count * ratio
-        actual_count = class_copy_count[class_idx]
+                    # Copy label file
+                    shutil.copy2(label_path, os.path.join(filtered_label_dir, label_file))
+                    
+                    # Find and copy corresponding image file
+                    base_name = label_file.replace('.txt', '')
+                    for ext in ['.jpg', '.jpeg', '.png']:
+                        image_path = os.path.join(original_image_dir, base_name + ext)
+                        if os.path.exists(image_path):
+                            shutil.copy2(image_path, os.path.join(filtered_image_dir, base_name + ext))
+                            break
         
-        print(f"  Class {class_idx}:")
-        print(f"    Original: {original_count} files")
-        print(f"    Ratio: {ratio}")
-        print(f"    Expected: {expected_count:.0f} copies")
-        print(f"    Actual: {actual_count} copies")
-        print(f"    Achievement: {(actual_count/expected_count*100):.1f}% of target")
+        print(f"Found {len(target_files)} files containing target classes")
+        print("Class distribution in filtered set:")
+        for class_id in self.target_classes:
+            print(f"Class {class_id}: {class_counts[class_id]} instances")
+        
+        return filtered_path, target_files, class_counts
+    
+    def calculate_oversampling_factors(self, class_counts):
+        """Calculate how many copies to make based on class frequency"""
+        max_count = max(class_counts.values()) if class_counts else 1
+        oversampling_factors = {}
+        
+        for class_id in self.target_classes:
+            count = class_counts.get(class_id, 0)
+            if count == 0:
+                oversampling_factors[class_id] = 0
+                continue
+                
+            ratio = max_count / count
+            factor = min(int(np.log2(ratio) * 2), 8)  # Cap at 8 copies
+            factor = max(factor, 1)
+            
+            oversampling_factors[class_id] = factor
+            print(f"Class {class_id}: {count} instances -> {factor} copies per file")
+        
+        return oversampling_factors
+    
+    def apply_augmentation(self, image, augmentation):
+        """Apply augmentation to image only (no bbox coordinate issues)"""
+        try:
+            augmented = augmentation(image=image)
+            return augmented['image']
+        except Exception as e:
+            print(f"Augmentation failed: {e}, using original")
+            return image
+    
+    def oversample_filtered_dataset(self, split='train'):
+        """Main oversampling function using filtered dataset"""
+        filtered_path, target_files, class_counts = self.filter_target_files(split)
+        
+        filtered_label_dir = os.path.join(filtered_path, 'labels')
+        filtered_image_dir = os.path.join(filtered_path, 'images')
+        
+        # Create augmented dataset folder
+        augmented_path = os.path.join(self.dataset_path, f'augmented_{split}')
+        augmented_label_dir = os.path.join(augmented_path, 'labels')
+        augmented_image_dir = os.path.join(augmented_path, 'images')
+        
+        os.makedirs(augmented_label_dir, exist_ok=True)
+        os.makedirs(augmented_image_dir, exist_ok=True)
+        
+        oversampling_factors = self.calculate_oversampling_factors(class_counts)
+        
+        print(f"\nStarting oversampling with {len(target_files)} filtered files...")
+        
+        total_new_files = 0
+        
+        for file_idx, label_file in enumerate(target_files):
+            if file_idx % 100 == 0:
+                print(f"Processing file {file_idx}/{len(target_files)}")
+            
+            # Determine max oversampling factor for this file
+            label_path = os.path.join(filtered_label_dir, label_file)
+            file_classes = set()
+            
+            with open(label_path, 'r') as f:
+                for line in f:
+                    parts = line.strip().split()
+                    if parts:
+                        class_id = int(parts[0])
+                        file_classes.add(class_id)
+            
+            max_factor = 0
+            for class_id in file_classes:
+                if class_id in self.target_classes:
+                    max_factor = max(max_factor, oversampling_factors[class_id])
+            
+            if max_factor == 0:
+                continue
+            
+            # Load image
+            base_name = label_file.replace('.txt', '')
+            image_path = None
+            for ext in ['.jpg', '.jpeg', '.png']:
+                potential_path = os.path.join(filtered_image_dir, base_name + ext)
+                if os.path.exists(potential_path):
+                    image_path = potential_path
+                    break
+            
+            if image_path is None:
+                continue
+            
+            image = cv2.imread(image_path)
+            if image is None:
+                continue
+            
+            # Copy original files to augmented dataset first
+            shutil.copy2(label_path, os.path.join(augmented_label_dir, label_file))
+            shutil.copy2(image_path, os.path.join(augmented_image_dir, base_name + os.path.splitext(image_path)[1]))
+            
+            # Create augmented copies
+            for copy_idx in range(max_factor):
+                # Apply random augmentation to image only
+                aug = random.choice(self.all_augmentations)
+                aug_image = self.apply_augmentation(image, aug)
+                
+                # Create new filenames
+                new_base_name = f"{base_name}_aug{copy_idx:02d}"
+                new_image_name = new_base_name + os.path.splitext(image_path)[1]
+                new_label_name = new_base_name + '.txt'
+                
+                # Save augmented image
+                new_image_path = os.path.join(augmented_image_dir, new_image_name)
+                cv2.imwrite(new_image_path, aug_image)
+                
+                # Copy original labels (same bboxes, different image)
+                # Since we're only doing color/quality augmentations, bboxes don't change
+                shutil.copy2(label_path, os.path.join(augmented_label_dir, new_label_name))
+                
+                total_new_files += 1
+        
+        print(f"\nOversampling completed!")
+        print(f"Created {total_new_files} new augmented samples")
+        print(f"Filtered dataset: {filtered_path}")
+        print(f"Augmented dataset: {augmented_path}")
+        
+        return augmented_path
+
+def main():
+    parser = argparse.ArgumentParser(description='Smart oversampling for BDD100k dataset')
+    parser.add_argument('--dataset_path', type=str, required=True, 
+                       help='Path to BDD100k dataset directory')
+    parser.add_argument('--split', type=str, default='train', 
+                       help='Dataset split to process (train/val)')
+    parser.add_argument('--target_classes', type=int, nargs='+', 
+                       default=[1, 3, 6, 80], 
+                       help='Target class IDs to oversample')
+    
+    args = parser.parse_args()
+    
+    # Initialize oversampler
+    oversampler = SmartOversampler(
+        dataset_path=args.dataset_path,
+        target_classes=args.target_classes
+    )
+    
+    # Run oversampling
+    augmented_path = oversampler.oversample_filtered_dataset(split=args.split)
+    print(f"\nUse this path for training: {augmented_path}")
 
 if __name__ == "__main__":
-    
-    ORIGNAL_IMG_DIR = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val"
-    ORIGNAL_LBL_DIR = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"
-    SAVE_IMG_DIR = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/images/val"
-    SAVE_LBL_DIR = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo_subset/labels/val"
-
-    # Change this to your underrepresented class IDs
-    #Left: Class ID, Right: Duplication amount
-    UNDER_REP_CLASSES = {
-        1:  1.72,
-        3:  3.82,
-        6:  71.4,
-        80: 2.0
-    } 
-
-    print("creating subset...")
-    create_subset(
-        ORIGNAL_IMG_DIR, 
-        ORIGNAL_LBL_DIR, 
-        SAVE_IMG_DIR, 
-        SAVE_LBL_DIR, 
-        UNDER_REP_CLASSES
-    )
+    main()
