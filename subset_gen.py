@@ -1,3 +1,12 @@
+"""
+Creates a filtered dataset that contains at least one of the given classes by the user. Then, it implementsa function where 
+it duplicates the given glasses by a certain ratio, depending on the number of instances seen within this filtered dataset. During
+duplication, each duplicated image will have a randomized augmentation implemented on it, to prevent the scenario of overfitting to 
+the duplicated images during fine tuning process. 
+
+Different to the python file dataset_split.py where that is purely splitting a dataset by a certain percentage. 
+"""
+
 import os
 import shutil
 import random

@@ -51,6 +51,16 @@ visdrone_to_coco = {
     3: 9    #motor (coco labels motor as motorcycle)
 }
 
+vehicle_to_coco = {
+    # 0: 2,
+    # 1: 10,
+    # 2: 1,
+    # 3: 9,
+    # 4: 3,
+    # 5: 2
+    11: 10
+}
+
 #function to remap the labels of given dataset to the labels used in coco dataset
 
 def remap_labels(label_dir, map_dic):
@@ -112,21 +122,21 @@ def has_duplicate_dicts(dict_list):
 
 if __name__ == "__main__":
 
-    folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"
-    target_class_id = [0,1,2,3,4,5,6,7,8,9]  # Change this to your desired class ID
+    # folder_path = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"
+    # target_class_id = [0,1,2,3,4,5,6,7,8,9]  # Change this to your desired class ID
 
-    for i in target_class_id:
+    # for i in target_class_id:
 
-        print(f"Searching for class ID {i} in labels...")
-        results = find_class_id_in_labels(folder_path, i)
-        print(f"Found class ID {i} {len(results)} times within the labels ")
+    #     print(f"Searching for class ID {i} in labels...")
+    #     results = find_class_id_in_labels(folder_path, i)
+    #     print(f"Found class ID {i} {len(results)} times within the labels ")
     
     #print(f"Found duplicates: {has_duplicate_dicts(results)}")
 
-    # #Put absolute path to which image folder you want to use for remapping labels
-    # label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/train'
+    #Put absolute path to which image folder you want to use for remapping labels
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/vehicles/vehicle dataset/train/labels'
     
-    # #CHANGE THE MAPPING PARAMETER BEFORE EXECUTING THE FILE!!!!!!
-    # remap_labels(label_directory, bdd100k_to_coco)
+    #CHANGE THE MAPPING PARAMETER BEFORE EXECUTING THE FILE!!!!!!
+    remap_labels(label_directory, vehicle_to_coco)
 
    
