@@ -95,9 +95,9 @@ def create_fine_tune_dataset(label_folder, image_folder, output_folder, percenta
 if __name__ == "__main__":
      # Configuration - Modify these paths and percentage as needed
 
-    LABEL_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/filtered_val/labels"  # Change this to your label folder path
-    IMAGE_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/filtered_val/images"  # Change this to your image folder path
-    OUTPUT_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/fine_tune_dataset"   # Output folder name
+    LABEL_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"  # Change this to your label folder path
+    IMAGE_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val"  # Change this to your image folder path
+    OUTPUT_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/20% BDD100k_val"   # Output folder name
     PERCENTAGE = 0.2  # 20% of the data
     
     create_fine_tune_dataset(LABEL_FOLDER, IMAGE_FOLDER, OUTPUT_FOLDER, PERCENTAGE)
