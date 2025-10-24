@@ -68,8 +68,8 @@ def plot_bounding_boxes(img_dir, label_dir, output_dir = None):
 
 if __name__ == "__main__":
     # print(f"Stupid {cv2.__file__}")
-    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/vehicles/vehicle dataset/train/images'
-    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/vehicles/vehicle dataset/train/labels'
+    img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/filtered_val/images'
+    label_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/filtered_val/labels'
     output_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/vehicles/vehicle dataset/train/train_bboxes_remap'
 
     # img_directory = '/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val'

@@ -1,7 +1,54 @@
 import os
 import shutil
 import random
-import argparse
+
+def create_remaining_contents_folder(partial_folder, all_folder, output_folder):
+    """
+    Create a folder containing files that are in the all_folder but not in the partial_folder.
+    
+    Args:
+        partial_folder (str): Path to the folder containing partial contents
+        all_folder (str): Path to the folder containing all contents
+        output_folder (str): Path where the remaining contents will be copied
+    """
+    
+    # Create output folder if it doesn't exist
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    # Get list of files in both folders
+    try:
+        partial_files = set(os.listdir(partial_folder))
+        all_files = set(os.listdir(all_folder))
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        return
+    
+    # Find files that are in 'all' but not in 'partial'
+    remaining_files = all_files - partial_files
+    
+    if not remaining_files:
+        print("No remaining files found. The partial folder already contains all files.")
+        return
+    
+    # Copy remaining files to output folder
+    copied_count = 0
+    for file_name in remaining_files:
+        source_path = os.path.join(all_folder, file_name)
+        dest_path = os.path.join(output_folder, file_name)
+        
+        try:
+            if os.path.isfile(source_path):
+                shutil.copy2(source_path, dest_path)
+                copied_count += 1
+            elif os.path.isdir(source_path):
+                shutil.copytree(source_path, dest_path)
+                copied_count += 1
+        except Exception as e:
+            print(f"Error copying {file_name}: {e}")
+    
+    print(f"Successfully copied {copied_count} items to {output_folder}")
+
 
 def create_fine_tune_dataset(label_folder, image_folder, output_folder, percentage, image_extensions=None):
     """
@@ -95,9 +142,16 @@ def create_fine_tune_dataset(label_folder, image_folder, output_folder, percenta
 if __name__ == "__main__":
      # Configuration - Modify these paths and percentage as needed
 
-    LABEL_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/labels/val"  # Change this to your label folder path
-    IMAGE_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/images/val"  # Change this to your image folder path
-    OUTPUT_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/20% BDD100k_val"   # Output folder name
-    PERCENTAGE = 0.2  # 20% of the data
+    LABEL_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/80%BDD100k_val/labels"  # Change this to your label folder path
+    IMAGE_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/80%BDD100k_val/images"  # Change this to your image folder path
+    OUTPUT_FOLDER = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/80%BDD100k_val/split"   # Output folder name
+    PERCENTAGE = 0.05  # 5% of the data
+
+    # PARTIAL_DIR_IMG = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/20% BDD100k_val/images_orig"
+    # PARTIAL_DIR_LBL = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/20% BDD100k_val/labels_orig"
+    # OUTPUT_DIR = "/home/yanjiaqi/own_ultralytics/ultralytics/datasets/BDD100k_yolo/80%BDD100k_val/labels"
+
     
     create_fine_tune_dataset(LABEL_FOLDER, IMAGE_FOLDER, OUTPUT_FOLDER, PERCENTAGE)
+
+    # create_remaining_contents_folder(PARTIAL_DIR_LBL, LABEL_FOLDER, OUTPUT_DIR)
