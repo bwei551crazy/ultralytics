@@ -2,11 +2,11 @@ from ultralytics import YOLO
 
 def main():
 
-    model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/rtdetrl_bdd100k_150_orig_lbl2_finetune/weights/best.pt")          #Change this to your custom trained model path
+    model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/rtdetrl_bdd100k_150_orig_lbl_finetune/weights/best.pt")          #Change this to your custom trained model path
 
-    # #Evaluating model inference performance    
+    #Evaluating model inference performance    
     results = model.predict(
-        source = "/home/yanjiaqi/own_ultralytics/ultralytics/data/images/Tuen Mun Highway East Bound屯門公路東行 .mp4",                                     #Chuck whatever file you want for model inference here. Can be images and video
+        source = "data/images/Kyoto walk.mp4",                                     #Chuck whatever file you want for model inference here. Can be images and video
         conf = 0.75,                                                                    #confidence cutoff point
         save = True,
         project = "my_test_runs/rtdetrl_infer",                                         #Main folder name path
@@ -24,6 +24,20 @@ def main():
     # metrics.box.maps                                  # a list contains map50-95 of each category
 
     # results[0].show()                                 #uses matplotlib
+    # "/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11m_bdd100k_150_orig_lbl2_finetune2"
+    # model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11m_bdd100k_150_orig_lbl2/weights/best.pt")
+
+    # model.export(
+    #     format = "onnx",
+    #     nms = True,
+    # )
+
+    # model.export(
+    #     format = "tflite",
+    #     int8 = True,
+    #     nms = True,
+    # )
+
 
 if __name__ == "__main__":
     main()
