@@ -98,7 +98,7 @@ def main():
     #     exist_ok = False                                          #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
     # )
 
-    model = YOLO(yolo11m)  # load a pretrained model (recommended for transfer learning)
+    model = YOLO(yolo11s)  # load a pretrained model (recommended for transfer learning)
 
 
     #     #=================================================Planned for YOLO training ==========================================================#
@@ -107,7 +107,7 @@ def main():
         epochs = 150,
         warmup_epochs = 5.0,
         imgsz = 1280,
-        batch = 8,
+        batch = 16,
         lr0 = 0.0001,
         lrf = 0.01,
         weight_decay = 0.0001,
@@ -130,14 +130,14 @@ def main():
         optimizer = 'AdamW',
         momentum = 0.9,
         project = "my_training_runs",
-        name = "yolo11m_bdd100k_150_orig_lbl_HIGH_IMGSZE",
+        name = "yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE",
         freeze = 10, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
         box = 7.5,# (float) box loss gain
         cls = 0.5, # (float) classification loss gain
         dfl = 1.5, # (float) distribution focal loss gain
         save = True,
-        exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
+        exist_ok = True #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
 
     )
     
