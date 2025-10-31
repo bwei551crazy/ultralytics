@@ -117,7 +117,7 @@ def main():
         hsv_s= 0.5,    # Randomly adjust saturation - helps with lighting changes
         hsv_v= 0.4,    # HSV value (brightness) augmentation fraction
         translate= 0.05,  # Randomly translate images by up to 10%
-        scale= 0.3,    # Randomly scale images by up to 50% - crucial for size variance
+        scale= 0.4,    # Randomly scale images by up to 50% - crucial for size variance
         shear= 0.0,    # Shear is less critical for vehicles, can keep low
         flipud= 0.0,   # Flip up-down (usually not logical for traffic scenes)
         fliplr= 0.5,  # Flip left-right - very logical and effective
@@ -130,14 +130,14 @@ def main():
         optimizer = 'AdamW',
         momentum = 0.9,
         project = "my_training_runs",
-        name = "yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE",
+        name = "yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE_two_datasets",
         freeze = 10, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
-        box = 7.5,# (float) box loss gain
-        cls = 0.5, # (float) classification loss gain
-        dfl = 1.5, # (float) distribution focal loss gain
+        box = 7.0,# (float) box loss gain
+        cls = 1.5, # (float) classification loss gain
+        dfl = 2.0, # (float) distribution focal loss gain
         save = True,
-        exist_ok = True #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
+        exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
 
     )
     

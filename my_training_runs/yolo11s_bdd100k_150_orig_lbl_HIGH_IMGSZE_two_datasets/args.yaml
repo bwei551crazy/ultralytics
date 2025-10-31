@@ -13,8 +13,8 @@ cache: false
 device: null
 workers: 8
 project: my_training_runs
-name: yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE
-exist_ok: true
+name: yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE_two_datasets
+exist_ok: false
 pretrained: true
 optimizer: AdamW
 verbose: true
@@ -103,4 +103,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: /home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE
+save_dir: /home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE_two_datasets
