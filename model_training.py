@@ -17,7 +17,7 @@ def main():
     custom_yolo = "my_training_runs/yolo11l_ua_detrac_2002/weights/last.pt" #Change this for different custom trained models
     rtdetr_l = "rtdetr-l.pt" #RTDETR large model
 
-    # model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/rtdetr_bdd100k_150_orig_lbl/weights/best.pt")  # load a pretrained model (recommended for transfer learning)
+    #model = YOLO(rtdetr_l)  # load a pretrained model (recommended for transfer learning)
 
     # # =================================================Fine-tuning dataset==========================================================#
     # results = model.train(
@@ -70,6 +70,9 @@ def main():
     #     lr0 = 0.0001,
     #     lrf = 0.01,
     #     weight_decay = 0.0001,
+    #     box = 7.0,
+    #     cls = 1.0,
+    #     dfl = 1.5,
     #     amp = True,
     #     augment= True,
     #     hsv_h= 0.05,                                              # Randomly adjust hue
@@ -88,7 +91,7 @@ def main():
     #     optimizer = 'AdamW',
     #     momentum = 0.9,
     #     project = "my_training_runs",
-    #     name = "rtdetr_bdd100k_150_orig_lbl",
+    #     name = "rtdetr_bdd100k_150_orig_lbl_two_datasets",
     #     warmup_epochs= 5.0,                                       # (float) warmup epochs 
     #     warmup_momentum= 0.9,                                     # (float) initial momentum during warmup
     #     warmup_bias_lr= 0.1,                                      # (float) bias learning rate during warmup
@@ -98,50 +101,7 @@ def main():
     #     exist_ok = False                                          #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
     # )
 
-    model = YOLO(yolo11s)  # load a pretrained model (recommended for transfer learning)
-
-
-    #     #=================================================Planned for YOLO training ==========================================================#
-    results = model.train(
-        data = "custom.yaml",    #"ultralytics/cfg/datasets/the-yaml-used",
-        epochs = 150,
-        warmup_epochs = 5.0,
-        imgsz = 1280,
-        batch = 16,
-        lr0 = 0.0001,
-        lrf = 0.01,
-        weight_decay = 0.0001,
-        amp = True,
-        augment= True,
-        hsv_h= 0.015,  # Randomly adjust hue
-        hsv_s= 0.5,    # Randomly adjust saturation - helps with lighting changes
-        hsv_v= 0.4,    # HSV value (brightness) augmentation fraction
-        translate= 0.05,  # Randomly translate images by up to 10%
-        scale= 0.4,    # Randomly scale images by up to 50% - crucial for size variance
-        shear= 0.0,    # Shear is less critical for vehicles, can keep low
-        flipud= 0.0,   # Flip up-down (usually not logical for traffic scenes)
-        fliplr= 0.5,  # Flip left-right - very logical and effective
-        degrees = 0.0,
-        copy_paste = 0.1,
-        mosaic= 0.5,   # Use mosaic augmentation (combines 4 images) - keep enabled
-        mixup= 0.0,    # Start with mixup off, can try 0.1 later if needed
-        cos_lr = True,  # Use cosine learning rate schedule for smoother training
-        patience = 20,  # Early stopping patience. If no observed improvements for n amount of epochs consecutively, will stop training. 
-        optimizer = 'AdamW',
-        momentum = 0.9,
-        project = "my_training_runs",
-        name = "yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE_two_datasets",
-        freeze = 10, 
-        save_period = 20, #Saves a checkpoint every 20 epochs 
-        box = 7.0,# (float) box loss gain
-        cls = 1.5, # (float) classification loss gain
-        dfl = 2.0, # (float) distribution focal loss gain
-        save = True,
-        exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
-
-    )
-    
-    # model = YOLO(yolo11l)  # load a pretrained model (recommended for transfer learning)
+    # model = YOLO(yolo11s)  # load a pretrained model (recommended for transfer learning)
 
 
     #     #=================================================Planned for YOLO training ==========================================================#
@@ -149,8 +109,8 @@ def main():
     #     data = "custom.yaml",    #"ultralytics/cfg/datasets/the-yaml-used",
     #     epochs = 150,
     #     warmup_epochs = 5.0,
-    #     imgsz = 800,
-    #     batch = 8,
+    #     imgsz = 1280,
+    #     batch = 16,
     #     lr0 = 0.0001,
     #     lrf = 0.01,
     #     weight_decay = 0.0001,
@@ -160,7 +120,7 @@ def main():
     #     hsv_s= 0.5,    # Randomly adjust saturation - helps with lighting changes
     #     hsv_v= 0.4,    # HSV value (brightness) augmentation fraction
     #     translate= 0.05,  # Randomly translate images by up to 10%
-    #     scale= 0.3,    # Randomly scale images by up to 50% - crucial for size variance
+    #     scale= 0.4,    # Randomly scale images by up to 50% - crucial for size variance
     #     shear= 0.0,    # Shear is less critical for vehicles, can keep low
     #     flipud= 0.0,   # Flip up-down (usually not logical for traffic scenes)
     #     fliplr= 0.5,  # Flip left-right - very logical and effective
@@ -169,20 +129,63 @@ def main():
     #     mosaic= 0.5,   # Use mosaic augmentation (combines 4 images) - keep enabled
     #     mixup= 0.0,    # Start with mixup off, can try 0.1 later if needed
     #     cos_lr = True,  # Use cosine learning rate schedule for smoother training
-    #     patience = 25,  # Early stopping patience
+    #     patience = 20,  # Early stopping patience. If no observed improvements for n amount of epochs consecutively, will stop training. 
     #     optimizer = 'AdamW',
     #     momentum = 0.9,
     #     project = "my_training_runs",
-    #     name = "yolo11l_bdd100k_150_orig_lbl",
+    #     name = "yolo11s_bdd100k_150_orig_lbl_HIGH_IMGSZE_two_datasets",
     #     freeze = 10, 
     #     save_period = 20, #Saves a checkpoint every 20 epochs 
-    #     box = 7.5,# (float) box loss gain
-    #     cls = 0.5, # (float) classification loss gain
-    #     dfl = 1.5, # (float) distribution focal loss gain
+    #     box = 7.0,# (float) box loss gain
+    #     cls = 1.5, # (float) classification loss gain
+    #     dfl = 2.0, # (float) distribution focal loss gain
     #     save = True,
     #     exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
 
     # )
+    
+    model = YOLO(yolo11n)  # load a pretrained model (recommended for transfer learning)
+
+
+        #=================================================Planned for YOLO training ==========================================================#
+    results = model.train(
+        data = "custom.yaml",    #"ultralytics/cfg/datasets/the-yaml-used",
+        epochs = 150,
+        warmup_epochs = 5.0,
+        imgsz = 800,
+        batch = 32,
+        lr0 = 0.0001,
+        lrf = 0.01,
+        weight_decay = 0.0001,
+        amp = True,
+        augment= True,
+        hsv_h= 0.015,  # Randomly adjust hue
+        hsv_s= 0.5,    # Randomly adjust saturation - helps with lighting changes
+        hsv_v= 0.4,    # HSV value (brightness) augmentation fraction
+        translate= 0.05,  # Randomly translate images by up to 10%
+        scale= 0.3,    # Randomly scale images by up to 50% - crucial for size variance
+        shear= 0.0,    # Shear is less critical for vehicles, can keep low
+        flipud= 0.0,   # Flip up-down (usually not logical for traffic scenes)
+        fliplr= 0.5,  # Flip left-right - very logical and effective
+        degrees = 0.0,
+        copy_paste = 0.1,
+        mosaic= 0.5,   # Use mosaic augmentation (combines 4 images) - keep enabled
+        mixup= 0.0,    # Start with mixup off, can try 0.1 later if needed
+        cos_lr = True,  # Use cosine learning rate schedule for smoother training
+        patience = 20,  # Early stopping patience
+        optimizer = 'AdamW',
+        momentum = 0.9,
+        project = "my_training_runs",
+        name = "yolo11n_bdd100k_150_orig_lbl_two datasets",
+        freeze = 10, 
+        save_period = 20, #Saves a checkpoint every 20 epochs 
+        box = 7.0,# (float) box loss gain
+        cls = 1.0, # (float) classification loss gain
+        dfl = 1.5, # (float) distribution focal loss gain
+        save = True,
+        exist_ok = False #overrides if folder with same name already exists. REMEMBER TO CHANGE TO FALSE WHEN DOING ACTUAL NEW TRAINING
+
+    )
 
     #===============================================For resuming training=======================================================#
     # results = model.train(resume = True)
