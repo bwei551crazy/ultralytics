@@ -27,7 +27,7 @@ def main():
 
     # results[0].show()                                 #uses matplotlib
     #"/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11m_bdd100k_150_orig_lbl2_finetune2"
-    model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11s_bdd100k_150_orig_lbl_two datasets/weights/best.pt")
+    # model = YOLO("/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11s_bdd100k_150_orig_lbl_two datasets/weights/best.pt")
 
     # model.export(
     #     format = "onnx",
@@ -35,23 +35,18 @@ def main():
     #     data = "custom.yaml"
     # )
 
-    model.export(
-        format = "tflite",
-        nms = True,
-        int8 = True,
-        fraction = 0.1,
-        data = "custom.yaml",
-        device = 0,
-        imgsz = 640
-    )
+    # model.export(
+    #     format = "tflite",
+    #     nms = True,
+    #     int8 = True,
+    #     fraction = 0.1,
+    #     data = "custom.yaml",
+    #     device = 0,
+    #     imgsz = 640
+    # )
 
     # model = YOLO("yolo11n.pt")
 
-    # model.export(
-    #     format = "onnx",
-    #     nms = True,
-    #     data = "coco.yaml"
-    # )
 
     # model.export(
     #     format = "tflite",
@@ -59,6 +54,51 @@ def main():
     #     data = "coco.yaml"
     # )
 
+    file_path = [
+        "/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11s_bdd100k_150_orig_lbl_two datasets/weights/best.pt",
+        "/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11m_bdd100k_150_orig_lbl2/weights/best.pt",
+        "/home/yanjiaqi/own_ultralytics/ultralytics/my_training_runs/yolo11n_bdd100k_150_orig_lbl_two datasets/weights/best.pt",
+        "/home/yanjiaqi/own_ultralytics/ultralytics/yolo11n.pt",
+        "/home/yanjiaqi/own_ultralytics/ultralytics/yolo11s.pt",
+        "/home/yanjiaqi/own_ultralytics/ultralytics/yolo11m.pt"
+    ]
+    onnxConvert(file_path)
+
+def onnxConvert(file_path):
+    try:
+        for i in file_path:
+            
+            if len(i.split('/')) > 6:
+                model_run = i.split('/')[6]
+                identifier = model_run.split('_')
+                
+                if ("bdd100k" in identifier) and ("two datasets" in identifier):
+                    model = YOLO(i)
+                    model.export(
+                        format = "onnx",
+                        nms = True,
+                        data = "custom.yaml",
+                        imgsz = model.model.args.get('imgsz') #Obtains the original imgsz used during training. 
+                    )
+                else: 
+                    model = YOLO(i)
+                    model.export(
+                        format = "onnx",
+                        nms = True,
+                        data = "bdd100k.yaml",
+                        imgsz = model.model.args.get('imgsz') #Obtains the original imgsz used during training. 
+                    )
+            else:
+                model = YOLO(i)
+                model.export(
+                    format = "onnx",
+                    nms = True,
+                    data = "coco.yaml",
+                    imgsz = 640
+                )
+        
+    except Exception as e:
+        print(f"An Error occurred during ONNX conversion: {e}")
 
 
 if __name__ == "__main__":
