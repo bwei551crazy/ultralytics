@@ -144,7 +144,7 @@ def main():
 
     # )
     
-    model = YOLO(yolo11n)  # load a pretrained model (recommended for transfer learning)
+    model = YOLO(yolo11s)  # load a pretrained model (recommended for transfer learning)
 
 
         #=================================================Planned for YOLO training ==========================================================#
@@ -153,7 +153,7 @@ def main():
         epochs = 150,
         warmup_epochs = 5.0,
         imgsz = 800,
-        batch = 32,
+        batch = 8,
         lr0 = 0.0001,
         lrf = 0.01,
         weight_decay = 0.0001,
@@ -176,7 +176,7 @@ def main():
         optimizer = 'AdamW',
         momentum = 0.9,
         project = "my_training_runs",
-        name = "yolo11n_bdd100k_150_orig_lbl_two datasets",
+        name = "yolo11s_bdd100k_150_orig_lbl_two datasets",
         freeze = 10, 
         save_period = 20, #Saves a checkpoint every 20 epochs 
         box = 7.0,# (float) box loss gain
